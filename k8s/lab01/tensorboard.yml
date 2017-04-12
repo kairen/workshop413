@@ -1,0 +1,41 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: tf-dashboard
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: tf-dashboard
+        role: dashboard
+    spec:
+      containers:
+      - name: tf-dashboard
+        image: tensorflow/tensorflow:1.0.1
+        ports:
+        - containerPort: 6006
+        command: ["/bin/sh", "-c"]
+        args: ["tensorboard --logdir=run1:/tmp/train --port=6006"]
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp/train
+      volumes:
+        - name: tmp
+          persistentVolumeClaim:
+            claimName: tmp-claim
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tf-dashboard
+spec:
+  selector:
+    app: tf-dashboard
+  type: LoadBalancer
+  externalIPs:
+  - 172.22.2.230
+  ports:
+  - port: 6006
+    targetPort: 6006
