@@ -82,5 +82,5 @@ if __name__ == "__main__":
     tf.app.run()
 
 '''
-python liner_dist.py --ps_hosts="localhost:2222" --worker_hosts="localhost:2223,localhost:2224" --job_name=worker --task_index=0 --log_path=./tmp/wk0 --loss_value=35
+python liner_dist.py --ps_hosts="localhost:2222" --worker_hosts="localhost:2223,localhost:2224" --job_name=worker --task_index=0 --log_path=./tmp/wk --loss_value=35
 '''

@@ -21,7 +21,7 @@ spec:
             "worker0.default.svc.cluster.local:2222,worker1.default.svc.cluster.local:2222,master.default.svc.cluster.local:2222"
         command: ["/bin/sh", "-c"]
         args: ["
-            curlhttps://gist.githubusercontent.com/kairen/8596142ca56c7945be5487c5ceb2ca43/raw/b4407f2f673a3febf11b98e4e16d7b98c04d1a47/multi_server.py -o /opt/multi_server.py;
+            curl https://gist.githubusercontent.com/kairen/8596142ca56c7945be5487c5ceb2ca43/raw/b4407f2f673a3febf11b98e4e16d7b98c04d1a47/multi_server.py -o /opt/multi_server.py;
             python /opt/multi_server.py \
                    --worker_hosts=${WORKER_HOSTS} \
                    --task_index=1 ;"]
