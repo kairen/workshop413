@@ -15,11 +15,14 @@ spec:
         image: tensorflow/tensorflow:1.0.1
         ports:
         - containerPort: 8888
+        env:
+        - name: TOKEN
+          value: "p@ssw0rd"
         command: ["/bin/sh", "-c"]
         args: ["
             rm -r /notebooks/*;
-            curl https://gist.githubusercontent.com/kairen/169bd3faccbb5298ef318e2295d5aa99/raw/e1fcb569c0dd13ef0c6bd11379b854edb486e9e7/client.ipynb -o /notebooks/client.ipynb;
-            /run_jupyter.sh;"]
+            curl https://gist.githubusercontent.com/kairen/0d983f72665227ccebaaf44fc83e9210/raw/f532f312fb5afa6c5f24d475b12e2faaf373d556/client.ipynb -o /notebooks/client.ipynb;
+            /run_jupyter.sh --NotebookApp.token=${TOKEN};"]
         volumeMounts:
         - name: tmp
           mountPath: /tmp/train

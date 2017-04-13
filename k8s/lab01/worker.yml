@@ -17,7 +17,7 @@ spec:
         - containerPort: 2222
         command: ["/bin/sh", "-c"]
         args: ["
-            curl https://gist.githubusercontent.com/kairen/169bd3faccbb5298ef318e2295d5aa99/raw/e1fcb569c0dd13ef0c6bd11379b854edb486e9e7/basic_server.py -o /opt/basic_server.py;
+            curl https://gist.githubusercontent.com/kairen/0d983f72665227ccebaaf44fc83e9210/raw/f532f312fb5afa6c5f24d475b12e2faaf373d556/basic_server.py -o /opt/basic_server.py;
             python /opt/basic_server.py;"]
 
 ---

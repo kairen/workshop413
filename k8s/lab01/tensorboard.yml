@@ -23,7 +23,7 @@ spec:
       volumes:
         - name: tmp
           persistentVolumeClaim:
-            claimName: tmp-claim
+            claimName: lab01-pvc
 
 ---
 apiVersion: v1

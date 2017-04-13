@@ -1,0 +1,56 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: master
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: master
+        role: worker
+    spec:
+      containers:
+      - name: master
+        image: tensorflow/tensorflow:1.0.1
+        ports:
+        - name: jupyter
+          containerPort: 8888
+        - name: worker
+          containerPort: 2222
+        env:
+        - name: TOKEN
+          value: "p@ssw0rd"
+        command: ["/bin/sh", "-c"]
+        args: ["rm -r /notebooks/*;
+                curl https://gist.githubusercontent.com/kairen/26f0aa9436d2d7b5bc3bbb0c72bfd175/raw/1a1bb288f97f3bbeb5e6fe398aee0eb5d1eccc86/train-data.txt -o train-data.txt;
+                curl https://gist.githubusercontent.com/kairen/8596142ca56c7945be5487c5ceb2ca43/raw/b4407f2f673a3febf11b98e4e16d7b98c04d1a47/master_client.ipynb -o master_client.ipynb;
+                /run_jupyter.sh --NotebookApp.token=${TOKEN};"]
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp/train
+      volumes:
+        - name: tmp
+          persistentVolumeClaim:
+            claimName: lab02-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: tf-master-service
+  name: master
+spec:
+  selector:
+    app: master
+  type: LoadBalancer
+  externalIPs:
+  - 172.22.2.230
+  ports:
+  - name: jupyter
+    port: 8888
+    targetPort: 8888
+  - name: worker
+    port: 2222
+    targetPort: 2222

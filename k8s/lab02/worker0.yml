@@ -16,28 +16,15 @@ spec:
         ports:
         - containerPort: 2222
         env:
-        - name: PS_HOSTS
-          valueFrom:
-            configMapKeyRef:
-              name: cluster-config
-              key: ps
         - name: WORKER_HOSTS
-          valueFrom:
-            configMapKeyRef:
-              name: cluster-config
-              key: worker
+          value:
+            "worker0.default.svc.cluster.local:2222,worker1.default.svc.cluster.local:2222,master.default.svc.cluster.local:2222"
         command: ["/bin/sh", "-c"]
         args: ["
-            curl https://gist.githubusercontent.com/kairen/169bd3faccbb5298ef318e2295d5aa99/raw/858002a5b928e142fcbd60b08baf34ad0bd3990e/liner_dist.py -o /opt/liner_dist.py;
-            python /opt/liner_dist.py \
-                   --ps_hosts=$(PS_HOSTS) \
-                   --worker_hosts=$(WORKER_HOSTS) \
-                   --job_name=worker \
-                   --task_index=0 \
-                   --log_path=/tmp/train \
-                   --loss_value=30 ;
-            echo 'Train done...';
-            while :; do sleep 2; done ;"]
+            curl https://gist.githubusercontent.com/kairen/8596142ca56c7945be5487c5ceb2ca43/raw/b4407f2f673a3febf11b98e4e16d7b98c04d1a47/multi_server.py -o /opt/multi_server.py;
+            python /opt/multi_server.py \
+                   --worker_hosts=${WORKER_HOSTS} \
+                   --task_index=0 ; "]
         volumeMounts:
         - name: tmp
           mountPath: /tmp/train

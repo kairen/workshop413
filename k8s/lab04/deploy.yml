@@ -1,0 +1,39 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: serving
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: serving
+    spec:
+      containers:
+      - name: serving
+        image: kairen/serving-base:0.5.1
+        ports:
+        - containerPort: 9000
+        resources:
+            requests:
+              memory: "128Mi"
+              cpu: "500m"
+            limits:
+              memory: "1024Mi"
+              cpu: "2000m"
+        command: ["/bin/sh", "-c"]
+        args: ["
+            cd /opt/serving;
+            bin/example/inception_saved_model \
+                         --checkpoint_dir=/tmp/model-data \
+                         --output_dir=inception-export;
+            bin/model_servers/tensorflow_model_server \
+                               --port=9000 --model_name=inception \
+                               --model_base_path=inception-export;"]
+        volumeMounts:
+        - name: model-data
+          mountPath: /tmp/model-data
+      volumes:
+      - name: model-data
+        persistentVolumeClaim:
+          claimName: lab04-pvc

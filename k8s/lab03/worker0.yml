@@ -1,9 +1,8 @@
-apiVersion: extensions/v1beta1
-kind: Deployment
+apiVersion: batch/v1
+kind: Job
 metadata:
   name: worker0
 spec:
-  replicas: 1
   template:
     metadata:
       labels:
@@ -28,7 +27,7 @@ spec:
               key: worker
         command: ["/bin/sh", "-c"]
         args: ["
-            curl https://gist.githubusercontent.com/kairen/169bd3faccbb5298ef318e2295d5aa99/raw/d1febdcf0d2e9fdd228cf14cc1914351eede27ce/cancer_classifier.py -o /opt/cancer_classifier.py;
+            curl https://gist.githubusercontent.com/kairen/17da73517ae6a2dca9df578d4b3adef0/raw/6ca3d7b15cf3dde5ab321ef43c4635b2d494a1a1/cancer_classifier.py -o /opt/cancer_classifier.py;
             python /opt/cancer_classifier.py \
                    --ps_hosts=$(PS_HOSTS) \
                    --worker_hosts=$(WORKER_HOSTS) \
@@ -36,13 +35,13 @@ spec:
                    --task_index=0 \
                    --log_path=/tmp/train \
                    --data_dir=/data ;
-            echo 'Train done...';
-            while :; do sleep 2; done ;"]
+            echo 'Train done...';"]
         volumeMounts:
         - name: data
           mountPath: /data
         - name: tmp
           mountPath: /tmp/train
+      restartPolicy: Never
       volumes:
         - name: data
           persistentVolumeClaim:

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: serving-service
+  name: serving
+spec:
+  selector:
+    app: serving
+  type: LoadBalancer
+  externalIPs:
+  - 172.22.2.230
+  ports:
+  - port: 9000
+    targetPort: 9000

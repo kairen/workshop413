@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: cluster-config
-  namespace: default
-data:
-  ps: "ps0.default.svc.cluster.local:2222"
-  worker: "worker0.default.svc.cluster.local:2222,worker1.default.svc.cluster.local:2222"

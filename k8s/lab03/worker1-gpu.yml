@@ -1,0 +1,90 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: worker1
+spec:
+  template:
+    metadata:
+      labels:
+        app: worker1
+        role: worker
+    spec:
+      containers:
+      - name: worker1
+        image: tensorflow/tensorflow:1.0.1-gpu
+        ports:
+        - containerPort: 2222
+        resources:
+          limits:
+            alpha.kubernetes.io/nvidia-gpu: 1
+        env:
+        - name: PS_HOSTS
+          valueFrom:
+            configMapKeyRef:
+              name: cluster-config
+              key: ps
+        - name: WORKER_HOSTS
+          valueFrom:
+            configMapKeyRef:
+              name: cluster-config
+              key: worker
+        command: ["/bin/sh", "-c"]
+        args: ["
+            curl https://gist.githubusercontent.com/kairen/17da73517ae6a2dca9df578d4b3adef0/raw/6ca3d7b15cf3dde5ab321ef43c4635b2d494a1a1/cancer_classifier.py -o /opt/cancer_classifier.py;
+            export CUDA_VISIBLE_DEVICES=0;
+            python /opt/cancer_classifier.py \
+                   --ps_hosts=$(PS_HOSTS) \
+                   --worker_hosts=$(WORKER_HOSTS) \
+                   --job_name=worker \
+                   --task_index=1 \
+                   --log_path=/tmp/train \
+                   --data_dir=/data ;
+            echo 'Train done...';"]
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        - name: tmp
+          mountPath: /tmp/train
+        - name: nvidia-driver-375-39
+          mountPath: /usr/local/nvidia
+          readOnly: true
+        - name: libcuda-so
+          mountPath: /usr/lib/x86_64-linux-gnu/libcuda.so
+        - name: libcuda-so-1
+          mountPath: /usr/lib/x86_64-linux-gnu/libcuda.so.1
+        - name: libcuda-so-375-39
+          mountPath: /usr/lib/x86_64-linux-gnu/libcuda.so.375.39
+      restartPolicy: Never
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: lab03-data-pvc
+        - name: tmp
+          persistentVolumeClaim:
+            claimName: lab03-tmp-pvc
+        - name: nvidia-driver-375-39
+          hostPath:
+            path: /var/lib/nvidia-docker/volumes/nvidia_driver/375.39
+        - name: libcuda-so
+          hostPath:
+            path: /usr/lib/x86_64-linux-gnu/libcuda.so
+        - name: libcuda-so-1
+          hostPath:
+            path: /usr/lib/x86_64-linux-gnu/libcuda.so.1
+        - name: libcuda-so-375-39
+          hostPath:
+            path: /usr/lib/x86_64-linux-gnu/libcuda.so.375.39
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: tf-worker1-service
+  name: worker1
+spec:
+  selector:
+    app: worker1
+  ports:
+  - port: 2222
+    targetPort: 2222
